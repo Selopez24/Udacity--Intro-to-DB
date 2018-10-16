@@ -1,16 +1,112 @@
-animals
-This table lists individual animals in the zoo. Each animal has only one row. There may be multiple animals with the same name, or even multiple animals with the same name and species.
-name — the animal's name (example: 'George')
-species — the animal's species (example: 'gorilla')
-birthdate — the animal's date of birth (example: '1998-05-18')
-diet
-This table matches up species with the foods they eat. Every species in the zoo eats at least one sort of food, and many eat more than one. If a species eats more than one food, there will be more than one row for that species.
-species — the name of a species (example: 'hyena')
-food — the name of a food that species eats (example: 'meat')
-taxonomy
-This table gives the (partial) biological taxonomic names for each species in the zoo. It can be used to find which species are more closely related to each other evolutionarily.
-name — the common name of the species (e.g. 'jackal')
-species — the taxonomic species name (e.g. 'aureus')
-genus — the taxonomic genus name (e.g. 'Canis')
-family — the taxonomic family name (e.g. 'Canidae')
-t_order — the taxonomic order name (e.g. 'Carnivora')
+-- animals
+-- This table lists individual animals in the zoo. Each animal has only one row. There may be multiple animals with the same name, or even multiple animals with the same name and species.
+-- name — the animal's name (example: 'George')
+-- species — the animal's species (example: 'gorilla')
+-- birthdate — the animal's date of birth (example: '1998-05-18')
+-- diet
+-- This table matches up species with the foods they eat. Every species in the zoo eats at least one sort of food, and many eat more than one. If a species eats more than one food, there will be more than one row for that species.
+-- species — the name of a species (example: 'hyena')
+-- food — the name of a food that species eats (example: 'meat')
+-- taxonomy
+-- This table gives the (partial) biological taxonomic names for each species in the zoo. It can be used to find which species are more closely related to each other evolutionarily.
+-- name — the common name of the species (e.g. 'jackal')
+-- species — the taxonomic species name (e.g. 'aureus')
+-- genus — the taxonomic genus name (e.g. 'Canis')
+-- family — the taxonomic family name (e.g. 'Canidae')
+-- t_order — the taxonomic order name (e.g. 'Carnivora')
+
+
+-- # Quizes from lesson 2
+
+-- # The query below finds the names and birthdates of all the gorillas.
+-- # 
+-- # Modify it to make it find the names of all the animals that are not
+-- # gorillas and not named 'Max'.
+-- #
+
+QUERY = '''
+select name  from animals where not (species = 'gorilla' or name = 'Max');
+'''
+
+-- #
+-- # Find all the llamas born between January 1, 1995 and December 31, 1998.
+-- # Fill in the 'where' clause in this query.
+
+QUERY = '''
+select name from animals where species = 'llama' and birthdate >= '1995-1-1' and birthdate <= '1998-31-1';
+'''
+
+-- #
+-- # Write a query that returns all the species in the zoo, and how many animals of
+-- # each species there are, sorted with the most populous species at the top.
+-- # 
+-- # The result should have two columns:  species and number.
+-- #
+-- # The animals table has columns (name, species, birthdate) for each individual.
+-- # 
+
+QUERY = "select  species, count (species) as number from animals group by species order by number desc;"
+
+-- #
+-- # Insert a newborn baby opossum into the animals table and verify that it's
+-- # been added. To do this, fill in the rest of SELECT_QUERY and INSERT_QUERY.
+-- # 
+-- # SELECT_QUERY should find the names and birthdates of all opossums.
+-- # 
+-- # INSERT_QUERY should add a new opossum to the table, whose birthdate is today.
+-- # (Or you can choose any other date you like.)
+-- #
+-- # The animals table has columns (name, species, birthdate) for each individual.
+-- #
+
+SELECT_QUERY = '''
+select  name, birthdate from animals where species = "opossum";
+'''
+
+INSERT_QUERY = '''
+insert into animals values('Maryan', 'opossum', '2001-04-02');
+'''
+
+-- #
+-- # Find the names of the individual animals that eat fish.
+-- #
+-- # The animals table has columns (name, species, birthdate) for each individual.
+-- # The diet table has columns (species, food) for each food that a species eats.
+-- #
+
+QUERY = '''
+select name from animals, diet where animals.species = diet.species and food = 'fish';
+'''
+
+-- #
+-- # Find the one food that is eaten by only one animal.
+-- #
+-- # The animals table has columns (name, species, birthdate) for each individual.
+-- # The diet table has columns (species, food) for each food that a species eats.
+-- #
+
+QUERY = '''
+select food, count (animals.name) as num from animals, diet  where animals.species = diet.species group by food having num = 1;
+'''
+
+-- #
+-- # List all the taxonomic orders, using their common names, sorted by the number of
+-- # animals of that order that the zoo has.
+-- #
+-- # The animals table has (name, species, birthdate) for each individual.
+-- # The taxonomy table has (name, species, genus, family, t_order) for each species.
+-- # The ordernames table has (t_order, name) for each order.
+-- #
+-- # Be careful:  Each of these tables has a column "name", but they don't have the
+-- # same meaning!  animals.name is an animal's individual name.  taxonomy.name is
+-- # a species' common name (like 'brown bear').  And ordernames.name is the common
+-- # name of an order (like 'Carnivores').
+
+QUERY = '''
+select ordernames.name, count (*) as num 
+        from animals, ordernames, taxonomy 
+         where animals.species = taxonomy.name and taxonomy.t_order = ordernames.t_order
+         group by ordernames.name
+         order by num desc; 
+'''
+
